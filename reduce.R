@@ -41,7 +41,7 @@ movement <- subset(movement, product_group_code == as.integer(pgcode) & product_
 
 # generate values we care about
 movement$volume <- movement$units * movement$size1_amount * movement$multi
-movement$sales <- movement$units / movement$prmult * movement$price
+movement$sales <- (movement$units / movement$prmult) * movement$price
 
 movement$units <- NULL
 movement$prmult <- NULL
