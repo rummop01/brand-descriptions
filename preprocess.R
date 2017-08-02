@@ -1,7 +1,9 @@
 #####
-# brands.R
+# preprocess.R
 # 07/18/2017
 # from the original data grabs all the brand names from the product_group_code identifiers of interest and their subgroups
+# tabulates the unit types for each product
+# generates an include.txt file with paths to each tsv data file for later processing
 #
 
 library(data.table)
@@ -43,3 +45,26 @@ for (drink in drinks) {
 
     write.csv(units, file=paste0("~/src/purchase-analysis/data/units/units-", drink, ".txt"), quote=F, row.names=F)
 }
+
+# generate pre-processing (include) file
+years <- c(2006:2015)
+alldrinks <- list()
+
+for (i in 1:length(years)) {
+    alldrinksyear <- c()
+
+    for (j in drinks) {
+    	print(paste("Getting product_group_code", sprintf("%04d", j), "from year", years[i]))
+	base <- paste0("~/nielsen_extracts/RMS/", years[i], "/Movement_Files/", sprintf("%04d", j), "_", years[i])
+	allsubdrinks <- list.files(base)
+	toexclude <- paste0(subset(exclude, product_group_code == j)$product_module_code, "_", years[i], ".tsv")
+	print(paste("    Excluding", toexclude))
+	allsubdrinks <- paste(base, setdiff(allsubdrinks, toexclude), sep="/")
+
+	alldrinksyear <- c(alldrinksyear, allsubdrinks)
+    }
+
+    alldrinks[[i]] <- alldrinksyear
+}
+
+write.table(unlist(alldrinks), file="~/src/purchase-analysis/include.txt", quote=F, row.names=F, col.names=F)
