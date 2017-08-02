@@ -1,4 +1,7 @@
 # purchase-analysis
+
+Nam Pho and [Pasquale Rummo](https://med.nyu.edu/faculty/pasquale-e-rummo)
+
 Analyzing consumer purchasing preference changes from implementing new public policies.
 
 1.) Run the `preprocess.R` script to generate the `data/brands/` and `data/units/` files as well as the `include.txt` file from the Nielsen data. The `include.txt` file is important for subsequent steps as it is a list of file paths to raw Nielsen movement data files. Alternatively you can use our output from this step.
