@@ -39,15 +39,26 @@ for (i in 1:length(drinks)) {
 }
 #saveRDS(alldata, file="~/src/purchase-analysis/rds/alldata.rds")
 
-weekly <- lapply(alldata, function(x) { print(head(x)); return( aggregate(x[, c("volume", "sales")], x[, c("week_end")], FUN=sum) ) } )
+annual <- lapply(alldata, function(x) { print(head(x)); return( aggregate(x[, c("volume", "sales")], x[, c("week_end")], FUN=sum) ) } )
+weekly <- annual
+vweekly <- lapply(weekly, function(x) { x$week_end <- as.Date(format(x$week_end, format="%m-%d"), format="%m-%d"); return(x) } )
+#saveRDS(annual, file="~/src/purchase-analysis/rds/annual.rds")
 #saveRDS(weekly, file="~/src/purchase-analysis/rds/weekly.rds")
 
 for (i in 1:length(drinks)) {
-    png(filename=paste0("~/src/purchase-analysis/figures/volume-", drinks[i], ".png"), width=1024, height=768)
-    plot((volume/10^9) ~ week_end, data=weekly[[i]], frame.plot=F, type='l', xlab="Time", ylab=expression(paste("Volume (", 10^9, " Ounces)")), main=paste0(names(drinks)[i], " (", drinks[i], ") Volume Purchased vs Time"), las=1)
+    png(filename=paste0("~/src/purchase-analysis/figures/volume-annual-", drinks[i], ".png"), width=1024, height=768)
+    plot((volume/10^9) ~ week_end, data=annual[[i]], frame.plot=F, type='l', xlab="Time", ylab=expression(paste("Volume (", 10^9, " Ounces)")), main=paste0(names(drinks)[i], " (", drinks[i], ") Volume Purchased vs Time"), las=1)
     dev.off()
 
-    png(filename=paste0("~/src/purchase-analysis/figures/sales-", drinks[i], ".png"), width=1024, height=768)
-    plot((sales/10^6) ~ week_end, data=weekly[[i]], frame.plot=F, type='l', xlab="Time", ylab="Sales ($ Million)", main=paste0(names(drinks)[i], " (", drinks[i], ") Sales Generated vs Time"), las=1)
+    png(filename=paste0("~/src/purchase-analysis/figures/sales-annual-", drinks[i], ".png"), width=1024, height=768)
+    plot((sales/10^6) ~ week_end, data=annual[[i]], frame.plot=F, type='l', xlab="Time", ylab="Sales ($ Million)", main=paste0(names(drinks)[i], " (", drinks[i], ") Sales Generated vs Time"), las=1)
+    dev.off()
+
+    png(filename=paste0("~/src/purchase-analysis/figures/volume-weekly-", drinks[i], ".png"), width=1024, height=768)
+    plot((volume/10^9) ~ week_end, data=weekly[[i]], frame.plot=F, type='p', pch=20, xlab="Time", ylab=expression(paste("Volume (", 10^9, " Ounces)")), main=paste0(names(drinks)[i], " (", drinks[i], ") Volume Purchased vs Time"), las=1)
+    dev.off()
+
+    png(filename=paste0("~/src/purchase-analysis/figures/sales-weekly-", drinks[i], ".png"), width=1024, height=768)
+    plot((sales/10^6) ~ week_end, data=weekly[[i]], frame.plot=F, type='p', pch=20, xlab="Time", ylab="Sales ($ Million)", main=paste0(names(drinks)[i], " (", drinks[i], ") Sales Generated vs Time"), las=1)
     dev.off()
 }
