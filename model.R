@@ -69,17 +69,21 @@ for (i in 1:length(bevcat)) {
     	print(paste(j, "of", nrow(category)))
 
     	if (is.null(base)) {
-    	   base <- alldatacov[[ toString(category$product_group_code[j]) ]]
+    	   base <- subset(alldatacov[[ toString(category$product_group_code[j]) ]], product_module_code == category$product_module_code[j])
 	} else {
-	   base <- rbind(base, alldatacov[[ toString(category$product_group_code[j]) ]])
+	   base <- rbind(base, subset(alldatacov[[ toString(category$product_group_code[j]) ]], product_module_code == category$product_module_code[j]) )
 	}
-    }    
-    alldatabev[[i]] <- base
+	print(paste("    adding", category$product_group_code[j], "-", category$product_module_code[j]))
+	print(paste("now at", nrow(base), "rows"))
+    }
+    print(paste("appending", nrow(base), "total rows"))
+    alldatabev[[i]] <- base     
 }
 names(alldatabev) <- bevcat
-#saveRDS(alldatacov, file="~/src/purchase-analysis/rds/alldatabev.rds")
+#saveRDS(alldatabev, file="~/src/purchase-analysis/rds/alldatabev.rds")
 
 for (i in 1:length(alldatabev)) {
+    print(paste("saving", bevcat[i]))
     write.table(alldatabev[[i]], file=paste0("~/src/purchase-analysis/data/beverage-categories/", bevcat[i], ".csv"), quote=F, sep=",", row.names=F)
 }
 
@@ -88,19 +92,27 @@ for (i in 1:length(alldatabev)) {
 #1 unadjusted everything
 allunadj.s <- list()
 allunadj.v <- list()
-for (i in 1:length(alldatacov)) {
-    allunadj.s[[i]] <- lm(sales  ~ week_end, data=alldatacov[[i]])
-    allunadj.v[[i]] <- lm(volume ~ week_end, data=alldatacov[[i]])
+for (i in 1:length(alldatabev)) {
+    print(paste("modeling", names(alldatabev)[i]))
+
+    allunadj.s[[i]] <- lm(sales  ~ week_end, data=alldatabev[[i]])
+    allunadj.v[[i]] <- lm(volume ~ week_end, data=alldatabev[[i]])
 }
-names(allunadj.s) <- names(drinks)
-names(allunadj.v) <- names(drinks)
+names(allunadj.s) <- names(alldatabev)
+names(allunadj.v) <- names(alldatabev)
+#saveRDS(allunadj.s, file="~/src/purchase-analysis/rds/allunadj.s.rds")
+#saveRDS(allunadj.v, file="~/src/purchase-analysis/rds/allunadj.v.rds")
 
 #2 adjusted everything
 alladj.s <- list()
 alladj.v <- list()
-for (i in 1:length(alldatacov)) {
-    alladj.s[[i]] <- lm(sales  ~ week_end + bmi + medhhinc + pct_female + pct_inlaborforce + pct_lsHS + pct_nhwhite + popcount + tert_medhhinc, data=alldatacov[[i]])
-    alladj.v[[i]] <- lm(volume ~ week_end + bmi + medhhinc + pct_female + pct_inlaborforce + pct_lsHS + pct_nhwhite + popcount + tert_medhhinc, data=alldatacov[[i]])
+for (i in 1:length(alldatabev)) {
+    print(paste("modeling", names(alldatabev)[i]))
+
+    alladj.s[[i]] <- lm(sales  ~ week_end + bmi + medhhinc + pct_female + pct_inlaborforce + pct_lsHS + pct_nhwhite + popcount, data=alldatabev[[i]])
+    alladj.v[[i]] <- lm(volume ~ week_end + bmi + medhhinc + pct_female + pct_inlaborforce + pct_lsHS + pct_nhwhite + popcount, data=alldatabev[[i]])
 }
-names(alladj.s) <- names(drinks)
-names(alladj.v) <- names(drinks)
+names(alladj.s) <- names(alldatabev)
+names(alladj.v) <- names(alldatabev)
+#saveRDS(alladj.s, file="~/src/purchase-analysis/rds/alladj.s.rds")
+#saveRDS(alladj.v, file="~/src/purchase-analysis/rds/alladj.v.rds")
