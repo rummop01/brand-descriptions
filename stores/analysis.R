@@ -20,8 +20,9 @@ for (i in 1:length(years)) {
 }
 names(include_annual) <- years
 
-#write.table(unlist(include_annual, use.names=F), file="~/src/purchase-analysis/stores/include.txt", quote=F, sep=",", col.names=F, row.names=F)
+write.table(unlist(include_annual, use.names=F), file="~/src/purchase-analysis/stores/include.txt", quote=F, sep=",", col.names=F, row.names=F)
 
+big10 <- subset(all_stores, all_stores$years_all == 10) 
 drink10 <- big10[, 1:2]
 for (i in 1:length(years)) {
     drink10[, paste0("year_", years[i])] <- 0 # assume store doesn't sell drinks unless proven otherwise
@@ -34,4 +35,14 @@ for (i in 1:length(years)) {
 	drink10[drink10$store_code_uc %in% stores_annual, paste0("year_", years[i])] <- 1 # tabulate if store exists this year out of stores we have 10 year data for
     }
 }
-write.table(drink10, file="~/src/purchase-analysis/stores/excel.csv", quote=F, sep=",", row.names=F)
+
+drink10$years_drink <- apply(drink10[, 3:12], 1, FUN=sum)
+write.table(drink10, file="~/src/purchase-analysis/stores/drink10.csv", quote=F, sep=",", row.names=F)
+
+all_stores$years_all <- ifelse(all_stores$years_all == 10, 1, 0)
+drink10$years_drink <- ifelse(drink10$years_drink == 10, 1, 0)
+
+excel <- merge(all_stores[, c("store_code_uc", "store_zip3", "fips_state_code", "fips_state_descr", "fips_county_code", "fips_county_descr", "years_all")], drink10[, c("store_code_uc", "store_zip3", "years_drink")], by=c("store_code_uc", "store_zip3"), all.x=T)
+excel$years_drink[is.na(excel$years_drink)] <- 0
+
+write.table(excel, file="~/src/purchase-analysis/stores/excel.csv", quote=F, sep=",", row.names=F)

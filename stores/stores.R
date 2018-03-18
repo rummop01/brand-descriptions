@@ -26,19 +26,12 @@ for (i in 1:length(annual_store_files)) {
 }
 
 # merge all store data by year into a single data.frame
-all_stores <- annual_store_data[[1]][, c(1, 6, 2)]
+all_stores <- annual_store_data[[1]][, c(1, 6, 7, 8, 9, 10, 2)]
 for (i in 2:length(annual_store_files)) {
-    all_stores <- merge(all_stores, annual_store_data[[i]][, c(1, 6, 2)], by=c("store_code_uc", "store_zip3"), all=T)
+    all_stores <- merge(all_stores, annual_store_data[[i]][, c(1, 6, 2)], by=c("store_code_uc", "store_zip3"), all=T) # merge by store, zip, year
 }
 all_stores[is.na(all_stores)] <- 0
 
-#write.table(all_stores, file="all_stores.csv", quote=F, sep=",", row.names=F)
-
 # if not writing to output, continue on to get a set of stores that exist across all 10 years
-all_stores$years <- apply(all_stores[, 3:12], 1, FUN=sum)
-big10 <- subset(all_stores, years == 10)
-
-# nrow(big10)
-# [1] 31653
-
-
+all_stores$years_all <- apply(all_stores[, 7:16], 1, FUN=sum)
+write.table(all_stores, file="~/src/purchase-analysis/stores/all_stores.csv", quote=F, sep=",", row.names=F)
