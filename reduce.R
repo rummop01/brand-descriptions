@@ -32,8 +32,8 @@ movement$display <- NULL
 movement$week_end <- as.Date(as.character(movement$week_end), format="%Y%m%d")
 
 # new code to subset data to those of which stores exist across all 10 years
-source("~/src/purchase-analysis/stores.R")
-movement <- subset(movement, movement$store_code_uc %in% big10$store_code_uc)
+big10 <- read.csv("~/src/purchase-analysis/stores/excel.csv", stringsAsFactors=F)
+movement <- subset(movement, movement$store_code_uc %in% subset(big10, big10$years_drink == 1)$store_code_uc)
 
 print("Merging movement and products files")
 movement <- merge(movement, products[, c("upc", "product_group_code", "product_module_code", "multi", "size1_amount", "size1_units")], by="upc", all.x=T)
