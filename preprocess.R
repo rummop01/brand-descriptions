@@ -10,7 +10,7 @@ library(data.table)
 products <- fread("~/nielsen_extracts/RMS/Master_Files/Latest/products.tsv", integer64="character")
 products <- subset(products, products$upc_ver_uc == 1) # only use version 1
 
-exclude <- read.csv("~/src/purchase-analysis/excluded-20170720.csv", stringsAsFactors=F)
+exclude <- read.csv("~/purchase-analysis/excluded-20170720.csv", stringsAsFactors=F)
 
 drinks <- c(1508, 507, 2506, 1503, 1006, 1020) # aka product_group_code
 names(drinks) <- c("non-carbonated", "juice", "milk", "carbonated", "coffee", "tea")
